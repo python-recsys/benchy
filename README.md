@@ -1,4 +1,4 @@
-benchy
-======
+Benchy
+==================
 
-A benchmark framework for testing algorithms and pairwise metrics.
+Benchmark Suite for testing recsys algorithms and pairwise metrics.
