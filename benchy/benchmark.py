@@ -127,6 +127,14 @@ class Benchmark(object):
         return ax
 
 
+class BenchmarkSuite(list):
+    """Basically a list, but the special type is needed for discovery"""
+    @property
+    def benchmarks(self):
+        """Discard non-benchmark elements of the list"""
+        return filter(lambda elem: isinstance(elem, Benchmark), self)
+
+
 def indent(string, spaces=4):
     dent = ' ' * spaces
     return '\n'.join([dent + x for x in string.split('\n')])
@@ -237,3 +245,13 @@ def magic_timeit(ns, stmt, ncalls=None, repeat=3, force_ms=False):
             'repeat': repeat,
             'timing': best * scaling[order],
             'units': units[order]}
+
+
+def gather_benchmarks(ns):
+    benchmarks = []
+    for v in ns.values():
+        if isinstance(v, Benchmark):
+            benchmarks.append(v)
+        elif isinstance(v, BenchmarkSuite):
+            benchmarks.extend(v.benchmarks)
+    return benchmarks
