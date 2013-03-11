@@ -1,6 +1,7 @@
 import traceback
 import cProfile
 import pstats
+import hashlib
 
 from cStringIO import StringIO
 
@@ -27,6 +28,10 @@ class Benchmark(object):
         exec self.setup in ns
         return ns
 
+    @property
+    def checksum(self):
+        return hashlib.md5(self.setup + self.code + self.cleanup).hexdigest()
+
     def _cleanup(self, ns):
         exec self.cleanup in ns
 
@@ -43,6 +48,11 @@ class Benchmark(object):
         prof.runcall(f)
 
         return pstats.Stats(prof).sort_stats('cumulative')
+
+    def get_results(self, db_path):
+        from benchy.db import BenchmarkDB
+        db = BenchmarkDB.get_instance(db_path)
+        return db.get_benchmark_results(self.checksum)
 
     def run(self):
         ns = self._setup()
