@@ -11,7 +11,7 @@ class Benchmark(object):
         name=None, description=None, start_date=None, logy=False):
         self.code = code
         self.setup = setup
-        self.cleanup = cleanup
+        self.cleanup = cleanup or ''
         self.ncalls = ncalls
         self.repeat = repeat
 

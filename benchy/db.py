@@ -33,13 +33,17 @@ class BenchmarkDb(object):
 
         self._con.commit()
 
-    def write_benchmark(self, bm, suite):
+    def write_benchmark(self, bm, suite=None):
         """
 
         """
-        self._cursor.execute('SELECT id FROM benchmarksuites \
-            where name = "%s"' % suite.name)
-        row = self._cursor.fetchone()
+        if suite is not None:
+            self._cursor.execute('SELECT id FROM benchmarksuites \
+                where name = "%s"' % suite.name)
+            row = self._cursor.fetchone()
+        else:
+            row = None
+
         if row == None:
             self._cursor.execute('INSERT INTO benchmarks VALUES (?, ?, ?, ?)',
                 (bm.checksum, bm.name, bm.description, None))
