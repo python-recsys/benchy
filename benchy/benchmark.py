@@ -8,7 +8,7 @@ from cStringIO import StringIO
 
 class Benchmark(object):
     def __init__(self, code, setup, ncalls=None, repeat=3, cleanup=None,
-        name=None, description=None, start_date=None, logy=False):
+       name=None, description=None, start_date=None, logy=False, db_path=None):
         self.code = code
         self.setup = setup
         self.cleanup = cleanup or ''
@@ -19,6 +19,7 @@ class Benchmark(object):
         self.description = description
         self.start_date = start_date
         self.logy = logy
+        self.db_path = db_path
 
     def __repr__(self):
         return "Benchmark('%s')" % self.name
@@ -49,9 +50,10 @@ class Benchmark(object):
 
         return pstats.Stats(prof).sort_stats('cumulative')
 
-    def get_results(self, db_path):
-        from benchy.db import BenchmarkDB
-        db = BenchmarkDB.get_instance(db_path)
+    def get_results(self, db_path=None):
+        db_path = self.db_path if db_path is None else db_path
+        from db import BenchmarkDb
+        db = BenchmarkDb.get_instance(db_path)
         return db.get_benchmark_results(self.checksum)
 
     def run(self):

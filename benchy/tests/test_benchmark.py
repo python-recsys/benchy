@@ -35,3 +35,5 @@ def test_benchmarks():
     suite.append(bench)
     suite.append(bench2)
     assert_equals(suite.benchmarks, [bench, bench2])
+
+

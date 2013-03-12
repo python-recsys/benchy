@@ -6,12 +6,20 @@ class BenchmarkDb(object):
     Persistence handler for bechmark results
     """
 
+    _instances = {}
+
     def __init__(self, dbpath):
         self.dbpath = dbpath
         self._con = sqlite3.connect(dbpath)
         self._cursor = self._con.cursor()
 
         self._create_tables()
+
+    @classmethod
+    def get_instance(cls, dbpath):
+        if dbpath not in cls._instances:
+            cls._instances[dbpath] = BenchmarkDb(dbpath)
+        return cls._instances[dbpath]
 
     def _create_tables(self):
         self._cursor.execute("drop table if exists benchmarksuites")
