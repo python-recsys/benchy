@@ -56,8 +56,11 @@ class BenchmarkDb(object):
         """
 
         """
-        self._cursor.execute('INSERT INTO results VALUES (?, ?, ?, ?, ?)',
+        self._cursor.execute('INSERT INTO results(checksum, timestamp, ncalls,\
+            timing, traceback) VALUES (?, ?, ?, ?, ?)',
             (checksum, timestamp, ncalls, timing, traceback))
+
+        self._con.commit()
 
     def get_benchmarks(self):
         self._cursor.execute('SELECT * FROM benchmarks')

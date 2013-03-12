@@ -8,7 +8,7 @@ from ..benchmark import Benchmark
 def test_databases():
     setup = ''
 
-    statement = "lst = ['c'] * 100"
+    statement = "lst = ['c'] * 10000"
     bench = Benchmark(statement, setup, name='list with "*"',
         description='List', start_date=datetime(2013, 3, 9))
 
@@ -26,3 +26,11 @@ def test_databases():
     for idx, result in enumerate(dbHandler.get_benchmarks()):
         print result
         assert_equals(checksums[idx], result[0])
+
+    result = bench.run()
+    dbHandler.write_result(bench.checksum,
+         datetime(2013, 3, 8), result['repeat'], result['timing'])
+
+    for idx, result in enumerate(
+                dbHandler.get_benchmark_results(bench.checksum)):
+        assert_equals(checksums[idx], result[1])

@@ -1,5 +1,5 @@
 from nose.tools import assert_equals
-from ..benchmark import Benchmark
+from ..benchmark import Benchmark, BenchmarkSuite
 from datetime import datetime
 
 
@@ -31,4 +31,7 @@ def test_benchmarks():
 
     assert_equals(bench2.run()['success'], True)
 
-
+    suite = BenchmarkSuite()
+    suite.append(bench)
+    suite.append(bench2)
+    assert_equals(suite.benchmarks, [bench, bench2])
