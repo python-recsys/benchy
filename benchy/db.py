@@ -10,7 +10,8 @@ class BenchmarkDb(object):
 
     def __init__(self, dbpath):
         self.dbpath = dbpath
-        self._con = sqlite3.connect(dbpath)
+        self._con = sqlite3.connect(dbpath,
+             detect_types=sqlite3.PARSE_DECLTYPES)
         self._cursor = self._con.cursor()
 
         self._create_tables()
@@ -36,7 +37,7 @@ class BenchmarkDb(object):
 
         self._cursor.execute('CREATE TABLE results(id integer \
             PRIMARY KEY AUTOINCREMENT, checksum text, \
-            timestamp date, ncalls text, timing float, traceback text,\
+            timestamp timestamp, ncalls text, timing float, traceback text,\
              FOREIGN KEY(checksum) REFERENCES benchmarks(checksum))')
 
         self._con.commit()

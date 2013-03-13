@@ -1,5 +1,6 @@
 from nose.tools import assert_equals
 from ..benchmark import Benchmark, BenchmarkSuite
+from ..db import BenchmarkDb
 from datetime import datetime
 
 
@@ -36,4 +37,16 @@ def test_benchmarks():
     suite.append(bench2)
     assert_equals(suite.benchmarks, [bench, bench2])
 
+    results = bench.run()
+    dbHandler = BenchmarkDb.get_instance('bench.db')
+    dbHandler.write_benchmark(bench)
+    dbHandler.write_result(bench.checksum,
+         datetime(2013, 3, 8), results['repeat'], results['timing'])
 
+    results = bench.run()
+    dbHandler.write_result(bench.checksum,
+         datetime(2013, 3, 9), results['repeat'], results['timing'])
+
+    import matplotlib.pyplot as plt
+    bench.plot('bench.db')
+    plt.show()

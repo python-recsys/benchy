@@ -16,7 +16,7 @@ def test_databases():
     bench2 = Benchmark(statement, setup, name='list with xrange',
         description='Xrange', start_date=datetime(2013, 3, 9))
 
-    dbHandler = BenchmarkDb.get_instance('bench.db')
+    dbHandler = BenchmarkDb('bench.db')
 
     dbHandler.write_benchmark(bench)
     dbHandler.write_benchmark(bench2)
@@ -24,6 +24,7 @@ def test_databases():
     checksums = [bench.checksum, bench2.checksum]
 
     for idx, result in enumerate(dbHandler.get_benchmarks()):
+        #print result
         assert_equals(checksums[idx], result[0])
 
     result = bench.run()

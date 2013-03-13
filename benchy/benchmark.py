@@ -93,33 +93,37 @@ class Benchmark(object):
 
         return output
 
-    def plot(self, db_path, label='time', ax=None, title=True):
+    def plot(self, db_path=None, label='time', ax=None, title=True):
         import matplotlib.pyplot as plt
-        from matplotlib.dates import MonthLocator, DateFormatter
 
+        db_path = self.db_path if db_path is None else db_path
         results = self.get_results(db_path)
 
         if ax is None:
             fig = plt.figure()
             ax = fig.add_subplot(111)
 
-        timing = results['timing']
         if self.start_date is not None:
-            timing = timing.truncate(before=self.start_date)
+            ids, timings = zip(*[(result[0], result[3]) for result in results if
+                result[2] <= self.start_date])
+        else:
+            ids, timings = zip(*[(result[2], result[3]) for result in results])
 
-        timing.plot(ax=ax, style='b-', label=label)
-        ax.set_xlabel('Date')
+        ax.plot(ids, timings, marker='-', color='b', label=label)
+        ax.set_xlabel('Ids')
         ax.set_ylabel('milliseconds')
 
         if self.logy:
             ax2 = ax.twinx()
             try:
-                timing.plot(ax=ax2, label='%s (log scale)' % label,
-                            style='r-',
-                            logy=self.logy)
+                ax2.plot(ids, timings, label='%s (log scale)' % label,
+                            marker='-', color='r')
+                ax2.set_yscale('log')
                 ax2.set_ylabel('milliseconds (log scale)')
                 ax.legend(loc='best')
                 ax2.legend(loc='best')
+                ax2.set_xticks(ids)
+
             except ValueError:
                 pass
 
@@ -128,10 +132,11 @@ class Benchmark(object):
         if ylo < 1:
             ax.set_ylim([0, yhi])
 
-        formatter = DateFormatter("%b %Y")
-        ax.xaxis.set_major_locator(MonthLocator())
-        ax.xaxis.set_major_formatter(formatter)
+        #formatter = DateFormatter("%b %Y")
+        #ax.xaxis.set_major_locator(MonthLocator())
+        #ax.xaxis.set_major_formatter(formatter)
         ax.autoscale_view(scalex=True)
+        ax.set_xticks(ids)
 
         if title:
             ax.set_title(self.name)
