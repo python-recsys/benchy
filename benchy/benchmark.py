@@ -8,7 +8,7 @@ from cStringIO import StringIO
 
 class Benchmark(object):
     def __init__(self, code, setup, ncalls=None, repeat=3, cleanup=None,
-       name=None, description=None, start_date=None, logy=False, db_path=None):
+       name=None, description=None, logy=False, db_path=None):
         self.code = code
         self.setup = setup
         self.cleanup = cleanup or ''
@@ -17,7 +17,6 @@ class Benchmark(object):
 
         self.name = name
         self.description = description
-        self.start_date = start_date
         self.logy = logy
         self.db_path = db_path
 
@@ -50,12 +49,6 @@ class Benchmark(object):
 
         return pstats.Stats(prof).sort_stats('cumulative')
 
-    def get_results(self, db_path=None):
-        db_path = self.db_path if db_path is None else db_path
-        from db import BenchmarkDb
-        db = BenchmarkDb.get_instance(db_path)
-        return db.get_benchmark_results(self.checksum)
-
     def run(self):
         ns = self._setup()
 
@@ -71,77 +64,6 @@ class Benchmark(object):
             result = {'success': False, 'traceback': buf.getvalue()}
         self._cleanup(ns)
         return result
-
-    def to_rst(self, image_path=None):
-        output = """**Benchmark setup**
-
-.. code-block:: python
-
-%s
-
-**Benchmark statement**
-
-.. code-block:: python
-
-%s
-
-""" % (indent(self.setup), indent(self.code))
-
-        if image_path is not None:
-            output += ("**Performance graph**\n\n.. image:: %s"
-                       "\n   :width: 6in" % image_path)
-
-        return output
-
-    def plot(self, db_path=None, label='time', ax=None, title=True):
-        import matplotlib.pyplot as plt
-
-        db_path = self.db_path if db_path is None else db_path
-        results = self.get_results(db_path)
-
-        if ax is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-
-        if self.start_date is not None:
-            ids, timings = zip(*[(result[0], result[3]) for result in results if
-                result[2] <= self.start_date])
-        else:
-            ids, timings = zip(*[(result[2], result[3]) for result in results])
-
-        ax.plot(ids, timings, marker='-', color='b', label=label)
-        ax.set_xlabel('Ids')
-        ax.set_ylabel('milliseconds')
-
-        if self.logy:
-            ax2 = ax.twinx()
-            try:
-                ax2.plot(ids, timings, label='%s (log scale)' % label,
-                            marker='-', color='r')
-                ax2.set_yscale('log')
-                ax2.set_ylabel('milliseconds (log scale)')
-                ax.legend(loc='best')
-                ax2.legend(loc='best')
-                ax2.set_xticks(ids)
-
-            except ValueError:
-                pass
-
-        ylo, yhi = ax.get_ylim()
-
-        if ylo < 1:
-            ax.set_ylim([0, yhi])
-
-        #formatter = DateFormatter("%b %Y")
-        #ax.xaxis.set_major_locator(MonthLocator())
-        #ax.xaxis.set_major_formatter(formatter)
-        ax.autoscale_view(scalex=True)
-        ax.set_xticks(ids)
-
-        if title:
-            ax.set_title(self.name)
-
-        return ax
 
 
 class BenchmarkSuite(list):
