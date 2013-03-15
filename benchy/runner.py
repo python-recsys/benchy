@@ -1,6 +1,8 @@
 import os
 import pickle
 import subprocess
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class BenchmarkRunner(object):
@@ -18,6 +20,21 @@ class BenchmarkRunner(object):
         self.benchmarks = benchmarks
         self.tmp_dir = tmp_dir
 
+    def relative_timings(self, results, ref_bench=None):
+        if ref_bench is None:
+            ref_timing = 1000000
+            for bm, rs in results.iteritems():
+                if rs['timing'] < ref_timing:
+                    ref_timing = rs['timing']
+                    ref_bench = bm
+
+        ref_timing = results[ref_bench]['timing']
+
+        for bm, rs in results.iteritems():
+            rs.update({'timeBaselines': rs['timing'] / ref_timing})
+
+        return results
+
     def run(self):
         results = {}
         for bm in self.benchmarks:
@@ -29,11 +46,11 @@ class BenchmarkRunner(object):
             if os.path.exists(results_path):
                 os.remove(results_path)
 
-            pickle.dump(bm, open(pickle_path, 'w'))
+            pickle.dump(bm, open(pickle_path, 'wb'))
 
             dirname = os.path.dirname(__file__)
 
-            cmd = 'python %s/run_benchmarks.py %s %s' % \
+            cmd = 'python %srun_benchmarks.py %s %s' % \
                         (dirname, pickle_path, results_path)
             print cmd
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
@@ -60,6 +77,58 @@ class BenchmarkRunner(object):
             except OSError:
                 pass
 
-            results[bm.checksum] = result
+            results[bm] = result
 
-        return len(self.benchmarks), results
+        return len(self.benchmarks), self.relative_timings(results)
+
+    def plot_relative(self, results, ref_bench=None,
+                    horizontal=False, colors=list('bgrcmyk')):
+        rects = []
+        labels = []
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax_pos = np.arange(len(results)) + 0.25
+        pos_prior = np.zeros(len(results))
+
+        if ref_bench is None:
+            time_reference = 1000000
+
+        for idx, (bm, result) in enumerate(results.iteritems()):
+            y = result['timeBaselines']
+            color = colors[idx % len(colors)]
+            rect = ax.barh(ax_pos[idx] + idx * 0.75 / len(results),
+                     y, 0.75 / len(results), left=pos_prior[idx],
+                    label=bm.name, color=color)
+
+            if y < time_reference:
+                ref_bench = (bm, result, idx)
+
+            rects.append(rect)
+            labels.append(bm.name)
+
+        ax.axvline(idx, color='k', lw=2)
+        patches = [r[0] for r in rects]
+        ax.legend(patches, labels, loc='best')
+        ax.set_xlabel('time ratio')
+        ax.set_title('Relative timings to %s' % ref_bench[0].name)
+        ax.grid(True)
+        plt.show()
+
+
+if __name__ == '__main__':
+    from benchmark import Benchmark, BenchmarkSuite
+    setup = ''
+    statement = "lst = ['c'] * 100000"
+    bench = Benchmark(statement, setup, name='list with "*"')
+
+    statement = "lst = ['c' for x in xrange(100000)]"
+    bench2 = Benchmark(statement, setup, name='list with xrange')
+
+    suite = BenchmarkSuite()
+    suite.append(bench)
+    suite.append(bench2)
+
+    runner = BenchmarkRunner(suite, '.')
+    n_benchs, results = runner.run()
+    runner.plot_relative(results)

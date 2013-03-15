@@ -46,8 +46,4 @@ def test_benchmark_runner():
     suite.append(bench2)
 
     runner = BenchmarkRunner(suite, '.')
-    print runner.run()
-
-
-
-
+    #print runner.run()

@@ -11,4 +11,4 @@ if __name__ == '__main__':
 
     res = benchmark.run()
 
-    benchmarks = pickle.dump(res, open(out_path, 'w'))
+    benchmarks = pickle.dump(res, open(out_path, 'wb'))
