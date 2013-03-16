@@ -16,9 +16,10 @@ class BenchmarkRunner(object):
     db_path: database path
 
     """
-    def __init__(self, benchmarks, tmp_dir):
+    def __init__(self, benchmarks, tmp_dir, name=''):
         self.benchmarks = benchmarks
         self.tmp_dir = tmp_dir
+        self.name = name
 
     def relative_timings(self, results, ref_bench=None):
         if ref_bench is None:
@@ -81,10 +82,41 @@ class BenchmarkRunner(object):
 
         return len(self.benchmarks), self.relative_timings(results)
 
+    def plot_absolute(self, results, horizontal=False, colors=list('bgrcmyk')):
+        rects = []
+        labels = []
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax_pos = np.arange(len(results)) + 0.25
+        pos_prior = np.zeros(len(results))
+
+        for idx, (bm, result) in enumerate(results.iteritems()):
+            units = result['units']
+            y = result['timing']
+            color = colors[idx % len(colors)]
+            rect = ax.barh(ax_pos[idx],
+                     y, 0.75 / 1, left=pos_prior[idx],
+                    label=bm.name, color=color)
+
+            rects.append(rect)
+            labels.append(bm.name)
+
+        patches = [r[0] for r in rects]
+        ax.legend(patches, labels, loc='best')
+        ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
+        ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+        ax.set_yticklabels([self.name], rotation=90)
+        ax.set_xlabel('time in %s' % units)
+        ax.set_title('Absolute timings in %s' % units)
+        ax.grid(True)
+        plt.show()
+
     def plot_relative(self, results, ref_bench=None,
                     horizontal=False, colors=list('bgrcmyk')):
         rects = []
         labels = []
+        time_reference = None
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -97,19 +129,27 @@ class BenchmarkRunner(object):
         for idx, (bm, result) in enumerate(results.iteritems()):
             y = result['timeBaselines']
             color = colors[idx % len(colors)]
-            rect = ax.barh(ax_pos[idx] + idx * 0.75 / len(results),
-                     y, 0.75 / len(results), left=pos_prior[idx],
+            rect = ax.barh(ax_pos[idx],
+                     y, 0.75 / 1, left=pos_prior[idx],
                     label=bm.name, color=color)
 
-            if y < time_reference:
-                ref_bench = (bm, result, idx)
+            if time_reference:
+                if result['timing'] < time_reference:
+                    ref_bench = (bm, result, 1.0)
+                    time_reference = result['timing']
+            else:
+                if bm == ref_bench:
+                    ref_bench = (bm, result, 1.0)
 
             rects.append(rect)
             labels.append(bm.name)
 
-        ax.axvline(idx, color='k', lw=2)
+        ax.axvline(1.0, color='k', lw=2, linestyle='--')
         patches = [r[0] for r in rects]
         ax.legend(patches, labels, loc='best')
+        ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
+        ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+        ax.set_yticklabels([self.name + ' (less is better)'], rotation=90)
         ax.set_xlabel('time ratio')
         ax.set_title('Relative timings to %s' % ref_bench[0].name)
         ax.grid(True)
@@ -125,10 +165,15 @@ if __name__ == '__main__':
     statement = "lst = ['c' for x in xrange(100000)]"
     bench2 = Benchmark(statement, setup, name='list with xrange')
 
+    statement = "lst = ['c' for x in range(100000)]"
+    bench3 = Benchmark(statement, setup, name='list with range')
+
     suite = BenchmarkSuite()
     suite.append(bench)
     suite.append(bench2)
+    suite.append(bench3)
 
-    runner = BenchmarkRunner(suite, '.')
+    runner = BenchmarkRunner(suite, '.', 'List Creation')
     n_benchs, results = runner.run()
     runner.plot_relative(results)
+    runner.plot_absolute(results)
