@@ -82,7 +82,14 @@ class BenchmarkRunner(object):
 
         return len(self.benchmarks), self.relative_timings(results)
 
-    def plot_absolute(self, results, horizontal=False, colors=list('bgrcmyk')):
+    def plot_absolute(self, results, horizontal=True, colors=list('bgrcmyk')):
+
+        def bar_f(ax, x, y, w, start=None, **kwds):
+            if not horizontal:
+                return ax.bar(x, y, w, bottom=start, **kwds)
+            else:
+                return ax.barh(x, y, w, left=start, **kwds)
+
         rects = []
         labels = []
 
@@ -95,8 +102,8 @@ class BenchmarkRunner(object):
             units = result['units']
             y = result['timing']
             color = colors[idx % len(colors)]
-            rect = ax.barh(ax_pos[idx],
-                     y, 0.75 / 1, left=pos_prior[idx],
+            rect = bar_f(ax, ax_pos[idx],
+                     y, 0.75 / 1, start=pos_prior[idx],
                     label=bm.name, color=color)
 
             rects.append(rect)
@@ -104,16 +111,41 @@ class BenchmarkRunner(object):
 
         patches = [r[0] for r in rects]
         ax.legend(patches, labels, loc='best')
-        ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
-        ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
-        ax.set_yticklabels([self.name], rotation=90)
-        ax.set_xlabel('time in %s' % units)
+
+        if horizontal:
+            ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
+            ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+            ax.set_yticklabels([self.name], rotation=90)
+            ax.set_xlabel('time in %s' % units)
+            for rect in rects:
+                rect = rect[0]
+                h = rect.get_width()
+                ax.text(1.1 * h, rect.get_y() + rect.get_height() / 2.,
+                     '%f' % (h), ha='center', va='bottom')
+        else:
+            ax.set_xlim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
+            ax.set_xticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+            ax.set_xticklabels([self.name], rotation=0)
+            ax.set_ylabel('time in %s' % units)
+            for rect in rects:
+                rect = rect[0]
+                h = rect.get_height()
+                ax.text(rect.get_x() + rect.get_width() / 2.,
+                    1.025 * h, '%f' % (h), ha='center', va='bottom')
+
         ax.set_title('Absolute timings in %s' % units)
         ax.grid(True)
         plt.show()
 
     def plot_relative(self, results, ref_bench=None,
-                    horizontal=False, colors=list('bgrcmyk')):
+                    horizontal=True, colors=list('bgrcmyk')):
+
+        def bar_f(ax, x, y, w, start=None, **kwds):
+            if not horizontal:
+                return ax.bar(x, y, w, bottom=start, **kwds)
+            else:
+                return ax.barh(x, y, w, left=start, **kwds)
+
         rects = []
         labels = []
         time_reference = None
@@ -129,8 +161,8 @@ class BenchmarkRunner(object):
         for idx, (bm, result) in enumerate(results.iteritems()):
             y = result['timeBaselines']
             color = colors[idx % len(colors)]
-            rect = ax.barh(ax_pos[idx],
-                     y, 0.75 / 1, left=pos_prior[idx],
+            rect = bar_f(ax, ax_pos[idx],
+                     y, 0.75 / 1, start=pos_prior[idx],
                     label=bm.name, color=color)
 
             if time_reference:
@@ -144,13 +176,31 @@ class BenchmarkRunner(object):
             rects.append(rect)
             labels.append(bm.name)
 
-        ax.axvline(1.0, color='k', lw=2, linestyle='--')
         patches = [r[0] for r in rects]
         ax.legend(patches, labels, loc='best')
-        ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
-        ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
-        ax.set_yticklabels([self.name + ' (less is better)'], rotation=90)
-        ax.set_xlabel('time ratio')
+        if horizontal:
+            ax.axvline(1.0, color='k', lw=2, linestyle='--')
+            ax.set_ylim([ax_pos[0] - 0.25, ax_pos[-1] + 1])
+            ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+            ax.set_yticklabels([self.name + ' (less is better)'], rotation=90)
+            ax.set_xlabel('time ratio')
+            for rect in rects:
+                rect = rect[0]
+                h = rect.get_width()
+                ax.text(1.1 * h, rect.get_y() + rect.get_height() / 2.,
+                     '%f' % (h), ha='center', va='bottom')
+        else:
+            ax.axhline(1.0, color='k', lw=2, linestyle='--')
+            ax.set_xlim([ax_pos[0] - 0.25, ax_pos[-1] + 1.])
+            ax.set_xticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+            ax.set_xticklabels([self.name + ' (less is better)'], rotation=0)
+            ax.set_ylabel('time ratio')
+            for rect in rects:
+                rect = rect[0]
+                h = rect.get_height()
+                ax.text(rect.get_x() + rect.get_width() / 2.,
+                    1.025 * h, '%f' % (h), ha='center', va='bottom')
+
         ax.set_title('Relative timings to %s' % ref_bench[0].name)
         ax.grid(True)
         plt.show()
@@ -161,6 +211,10 @@ if __name__ == '__main__':
     setup = ''
     statement = "lst = ['c'] * 100000"
     bench = Benchmark(statement, setup, name='list with "*"')
+    results = bench.run()
+    rst_text = bench.to_rst(results)
+    with open('teste.rst', 'w') as f:
+            f.write(rst_text)
 
     statement = "lst = ['c' for x in xrange(100000)]"
     bench2 = Benchmark(statement, setup, name='list with xrange')
@@ -175,5 +229,8 @@ if __name__ == '__main__':
 
     runner = BenchmarkRunner(suite, '.', 'List Creation')
     n_benchs, results = runner.run()
-    runner.plot_relative(results)
-    runner.plot_absolute(results)
+    #runner.plot_relative(results, horizontal=True)
+    #runner.plot_absolute(results, horizontal=True)
+
+    #runner.plot_relative(results, horizontal=False)
+    #runner.plot_absolute(results, horizontal=False)

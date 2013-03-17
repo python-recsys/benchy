@@ -1,0 +1,2 @@
+import benchy
+benchy.test()
