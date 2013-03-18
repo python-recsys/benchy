@@ -35,13 +35,13 @@ function ``create_list`` that allocates the list ``a`` with 100000 elements::
 
     common_setup = ""
     statement = "lst = ['i' for x in range(100000)]"
-    benchmark1 = BenchMark(statement, common_setup, name= "range")
+    benchmark1 = Benchmark(statement, common_setup, name= "range")
 
     statement = "lst = ['i' for x in xrange(100000)]"
-    benchmark2 = BenchMark(statement, common_setup, name= "xrange")
+    benchmark2 = Benchmark(statement, common_setup, name= "xrange")
 
     statement = "lst = ['i'] * 100000"
-    benchmark3 = BenchMark(statement, common_setup, name= "range")
+    benchmark3 = Benchmark(statement, common_setup, name= "range")
 
 
 With all benchmarks created, we could test a simple benchmark by
@@ -49,7 +49,8 @@ calling the method ``run``::
 
     print benchmark1.run()
 
-The output will follow the structure below:
+The output will follow the structure below::
+
     {'memory': {'repeat': 3,
                 'success': True,
                 'units': 'MB',
@@ -81,8 +82,7 @@ This class can load all the benchmarks from the suite and run each individual
 analysis and print out interesting reports::
 
     from benchy.api import BenchmarkRunner
-    runner = BenchmarkRunner(benchmarks=suite, tmp_dir='.',
-        name= 'List Allocation Benchmark')
+    runner = BenchmarkRunner(benchmarks=suite, tmp_dir='.', name= 'List Allocation Benchmark')
 
 
 Let's run the suite::
