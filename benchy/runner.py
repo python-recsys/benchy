@@ -26,14 +26,16 @@ class BenchmarkRunner(object):
         if ref_bench is None:
             ref_timing = 1000000
             for bm, rs in results.iteritems():
+                rs = rs['runtime']
                 if rs['timing'] < ref_timing:
                     ref_timing = rs['timing']
                     ref_bench = bm
 
-        ref_timing = results[ref_bench]['timing']
+        ref_timing = results[ref_bench]['runtime']['timing']
 
         for bm, rs in results.iteritems():
-            rs.update({'timeBaselines': rs['timing'] / ref_timing})
+            rs['runtime'].update(
+                {'timeBaselines': rs['runtime']['timing'] / ref_timing})
 
         return results
 
@@ -100,6 +102,7 @@ class BenchmarkRunner(object):
         pos_prior = np.zeros(len(results))
 
         for idx, (bm, result) in enumerate(results.iteritems()):
+            result = result['runtime']
             units = result['units']
             y = result['timing']
             color = colors[idx % len(colors)]
@@ -163,6 +166,7 @@ class BenchmarkRunner(object):
             time_reference = 1000000
 
         for idx, (bm, result) in enumerate(results.iteritems()):
+            result = result['runtime']
             y = result['timeBaselines']
             color = colors[idx % len(colors)]
             rect = bar_f(ax, ax_pos[idx],
@@ -256,6 +260,7 @@ Produced on a machine with
 
         reducedTable = []
         for bm, result in results.iteritems():
+            result = result['runtime']
             row = []
             result['name'] = bm.name
             for h in header:
@@ -304,6 +309,7 @@ if __name__ == '__main__':
     statement = "lst = ['c'] * 100000"
     bench = Benchmark(statement, setup, name='list with "*"')
     results = bench.run()
+    print results
     rst_text = bench.to_rst(results)
     with open('teste.rst', 'w') as f:
             f.write(rst_text)

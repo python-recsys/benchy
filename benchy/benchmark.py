@@ -5,7 +5,7 @@ import hashlib
 import string
 import os
 from cStringIO import StringIO
-from utils import indent, magic_timeit
+from utils import indent, magic_timeit, magic_memit
 
 
 class Benchmark(object):
@@ -56,6 +56,8 @@ class Benchmark(object):
         return output
 
     def getTable(self, results, numberFormat="%.4g", **kwargs):
+
+        results = results['runtime']
 
         # format = ['%s', '%s', '%d', "%.4g", "%.4g", "%.4g"]
 
@@ -118,11 +120,35 @@ class Benchmark(object):
         return pstats.Stats(prof).sort_stats('cumulative')
 
     def run(self):
+        results = {}
+        results['memory'] = self.run_memit()
+        results['runtime'] = self.run_timeit()
+
+        return results
+
+    def run_timeit(self):
         ns = self._setup()
 
         try:
             result = magic_timeit(ns, self.code, ncalls=self.ncalls,
                 repeat=self.repeat, force_ms=True)
+
+            result['success'] = True
+
+        except:
+            buf = StringIO()
+            traceback.print_exc(file=buf)
+            result = {'success': False, 'traceback': buf.getvalue()}
+
+        self._cleanup(ns)
+        return result
+
+    def run_memit(self):
+        ns = self._setup()
+
+        try:
+            result = magic_memit(ns, self.code, ncalls=self.ncalls,
+                repeat=self.repeat)
 
             result['success'] = True
 
