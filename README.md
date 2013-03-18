@@ -1,11 +1,11 @@
 =================
 Benchy
 =================
-A lightweight benchmarking framework written in Python focused on perform
-comparisons of memory consumption and runtime performance for Python programs.
+A lightweight benchmarking framework written in Python focused on performing
+ memory consumption and runtime performance comparison for Python programs.
 
-THe goal of this framework is to help scientific developers to perform faster
-benchmarkings with several algorithmical approaches written in Python.
+THe goal of this framework is to help scientific developers to perform
+benchmarkings of several algorithmical approaches written in Python.
 
 It's has the `memory_profiler <http://pypi.python.org/pypi/psutil>`_ ,
 `numpy <http://pypi.python.org/pypi/psutil>`_  and
@@ -17,7 +17,7 @@ It's has the `memory_profiler <http://pypi.python.org/pypi/psutil>`_ ,
 ==============
 To install through easy_install or pip::
 
-    $ easy_install -U memory_profiler # pip install -U memory_profiler
+    $ easy_install -U benchy # pip install -U benchy
 
 To install from source, download the package, extract and type::
 
@@ -27,11 +27,9 @@ To install from source, download the package, extract and type::
 =======
  Usage
 =======
-The line-by-line profiler is used much in the same way of the
-line_profiler: you must first decorate the function you would like to
-profile with ``@profile``. In this example, we create a simple function
-``my_func`` that allocates lists ``a``, ``b`` and then deletes ``b``::
-
+To use the benchy framework, you must first define the functions you would
+like to benchmark. In this example, we create three versions of a simple
+function ``create_list`` that allocates the list ``a`` with 100000 elements::
 
     @profile
     def my_func():
