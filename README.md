@@ -31,6 +31,7 @@ To use the benchy framework, you must first define the functions you would
 like to benchmark. In this example, we create three versions of a simple
 function ``create_list`` that allocates the list ``a`` with 100000 elements::
 
+
     @profile
     def my_func():
         a = [1] * (10 ** 6)
@@ -226,15 +227,11 @@ file ~/.ipython/ipy_user_conf.py to add the following lines::
 ===========================
  Support, bugs & wish list
 ===========================
-For support, please ask your question on `stack overflow
-<http://stackoverflow.com/>`_ and add the *profiling* tag.
 Send issues, proposals, etc. to `github's issue tracker
-<https://github.com/fabianp/memory_profiler/issues>`_ .
+<https://github.com/python-recsys/benchy/issues>`_ .
 
 If you've got questions regarding development, you can email me
-directly at fabian@fseoane.net
-
-.. image:: http://fseoane.net/static/tux_memory_small.png
+directly at marcel@pingmind.com
 
 
 =============
@@ -242,26 +239,15 @@ directly at fabian@fseoane.net
 =============
 Latest sources are available from github:
 
-    https://github.com/fabianp/memory_profiler
+    https://github.com/python-recsys/benchy
 
 
 =========
  Authors
 =========
-This module was written by `Fabian Pedregosa <http://fseoane.net>`_
-inspired by Robert Kern's `line profiler
-<http://packages.python.org/line_profiler/>`_.
-
-`Tom <http://tomforb.es/>`_ added windows support and speed improvements via the
-`psutil <http://pypi.python.org/pypi/psutil>`_ module.
-
-`Victor <https://github.com/octavo>`_ added python3 support, bugfixes and general
-cleanup.
-
-`Vlad Niculae <http://vene.ro/>`_ added the `%mprun` and `%memit` IPython magics.
-
-`Thomas Kluyver <https://github.com/takluyver>`_ added the IPython extension.
-
+This module was written by `Marcel Caraciolo <http://aimotion.blogspot.com>`_
+inspired by Wes Mckinney `vbench
+<https://github.com/pydata/vbench>`_.
 
 
 =========
