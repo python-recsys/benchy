@@ -1,10 +1,9 @@
 =================
 Benchy
 =================
-A lightweight benchmarking framework written in Python focused on performing
- memory consumption and runtime performance comparison for Python programs.
+A lightweight benchmarking framework written in Python focused on performing memory consumption and runtime performance comparison for Python programs.
 
-THe goal of this framework is to help scientific developers to perform
+The goal of this framework is to help scientific developers to perform
 benchmarkings of several algorithmical approaches written in Python.
 
 It's has the `memory_profiler <http://pypi.python.org/pypi/psutil>`_ ,

@@ -85,7 +85,8 @@ class BenchmarkRunner(object):
 
         return len(self.benchmarks), self.relative_timings(results)
 
-    def plot_absolute(self, results, horizontal=True, colors=list('bgrcmyk')):
+    def plot_absolute(self, results, fig=None, horizontal=True,
+            colors=list('bgrcmyk')):
 
         def bar_f(ax, x, y, w, start=None, **kwds):
             if not horizontal:
@@ -95,13 +96,16 @@ class BenchmarkRunner(object):
 
         rects = []
         labels = []
+        memories = []
 
-        fig = plt.figure()
+        if fig is None:
+            fig = plt.figure()
         ax = fig.add_subplot(111)
         ax_pos = np.arange(len(results)) + 0.25
         pos_prior = np.zeros(len(results))
 
         for idx, (bm, result) in enumerate(results.iteritems()):
+            memories.append(result['memory']['usage'])
             result = result['runtime']
             units = result['units']
             y = result['timing']
@@ -131,20 +135,28 @@ class BenchmarkRunner(object):
             ax.set_xticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
             ax.set_xticklabels([self.name], rotation=0)
             ax.set_ylabel('time in %s' % units)
+            x_pos = []
             for rect in rects:
                 rect = rect[0]
                 h = rect.get_height()
+                x_pos.append(rect.get_x() + rect.get_width() / 2.)
                 ax.text(rect.get_x() + rect.get_width() / 2.,
                     1.025 * h, '%f' % (h), ha='center', va='bottom')
+            ax2 = ax.twinx()
+            ax2.plot(x_pos, memories, 'o-')
+            ax2.set_xticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
+            ax2.set_ylabel('memory in MB')
+            ax2.set_xticklabels([self.name], rotation=0)
 
         ax.set_title('Absolute timings in %s' % units)
         ax.grid(True)
 
         start, end = ax.get_xlim()
         plt.xlim([start, end + 2])
-        plt.savefig('%s.png' % self.name, bbox_inches='tight')
+        #plt.savefig('%s.png' % self.name, bbox_inches='tight')
+        return fig
 
-    def plot_relative(self, results, ref_bench=None,
+    def plot_relative(self, results, ref_bench=None, fig=None,
                     horizontal=True, colors=list('bgrcmyk')):
 
         def bar_f(ax, x, y, w, start=None, **kwds):
@@ -157,7 +169,8 @@ class BenchmarkRunner(object):
         labels = []
         time_reference = None
 
-        fig = plt.figure()
+        if fig is None:
+            fig = plt.figure()
         ax = fig.add_subplot(111)
         ax_pos = np.arange(len(results)) + 0.25
         pos_prior = np.zeros(len(results))
@@ -214,7 +227,8 @@ class BenchmarkRunner(object):
 
         start, end = ax.get_xlim()
         plt.xlim([start, end + 2])
-        plt.savefig('%s_r.png' % self.name, bbox_inches='tight')
+
+        return fig
 
     def to_rst(self, results, image_relative_path=None,
         image_absolute_path=None):
@@ -308,17 +322,16 @@ if __name__ == '__main__':
     setup = ''
     statement = "lst = ['c'] * 100000"
     bench = Benchmark(statement, setup, name='list with "*"')
-    results = bench.run()
-    print results
-    rst_text = bench.to_rst(results)
-    with open('teste.rst', 'w') as f:
-            f.write(rst_text)
 
     statement = "lst = ['c' for x in xrange(100000)]"
     bench2 = Benchmark(statement, setup, name='list with xrange')
 
     statement = "lst = ['c' for x in range(100000)]"
     bench3 = Benchmark(statement, setup, name='list with range')
+    results = bench3.run()
+    rst_text = bench3.to_rst(results)
+    with open('teste.rst', 'w') as f:
+            f.write(rst_text)
 
     suite = BenchmarkSuite()
     suite.append(bench)
@@ -327,8 +340,14 @@ if __name__ == '__main__':
 
     runner = BenchmarkRunner(suite, '.', 'List Creation')
     n_benchs, results = runner.run()
-    runner.plot_relative(results, horizontal=True)
-    runner.plot_absolute(results, horizontal=True)
+    print results
+    fig = runner.plot_relative(results, horizontal=True)
+    #plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
+
+    #runner.plot_absolute(results, horizontal=False)
+    #plt.savefig('%s.png' % runner.name) # bbox_inches='tight')
+
+    #runner.plot_absolute(results, horizontal=False)
     rst_text = runner.to_rst(results, runner.name + 'png',
             runner.name + '_r.png')
     with open('teste.rst', 'w') as f:
