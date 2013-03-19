@@ -147,6 +147,18 @@ Going back to the list allocation, let's save the plot::
 .. image:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
 
 
+As you can see the graph aboe the xrange method is 12x slower and the range approach is 13x.  Let's see the absolute timings. Just call the method ``plot_absolute`
+
+    def plot_absolute(self, results, fig=None, horizontal=True,
+            colors=list('bgrcmyk')):
+
+
+Showing the plot now::
+
+    runner.plot_absolute(results, horizontal=False)
+    plt.savefig('%s.png' % runner.name) # bbox_inches='tight')
+
+.. image:: https://dl.dropbox.com/u/1977573/ListCreation.png
 
 
 ============================
