@@ -134,7 +134,19 @@ Next, we will plot the relative timings. It is important to measure how faster t
 
     def plot_relative(self, results, ref_bench=None, fig=None,
                     horizontal=True, colors=list('bgrcmyk')):
+        """Relative plot.
+            Parameters:
+            -----------
+            results: The benchmark results from BenchmarkRunner.
+            ref_bench: The Benchmark object that will be the baseline, optional
+            fig: matplotlib figure object, optional
+            horizontal: The plot will be horizontal or vertical, optional
+            colors:  the colormap for the plots, optional
 
+            Returns:
+            --------
+            fig: matplotlib figure
+        """
         ...
 
 Going back to the list allocation, let's save the plot::
@@ -150,7 +162,19 @@ As you can see the graph aboe the xrange method is 12x slower and the range appr
 
     def plot_absolute(self, results, fig=None, horizontal=True,
             colors=list('bgrcmyk')):
+        """Absolute Timing plot.
+            Parameters:
+            -----------
+            results: The benchmark results from BenchmarkRunner.
+            fig: matplotlib figure object, optional
+            horizontal: The plot will be horizontal or vertical, optional
+            colors:  the colormap for the plots, optional
 
+            Returns:
+            --------
+            fig: matplotlib figure
+        """
+        ...
 
 Showing the plot now::
 

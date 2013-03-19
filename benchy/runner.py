@@ -87,6 +87,18 @@ class BenchmarkRunner(object):
 
     def plot_absolute(self, results, fig=None, horizontal=True,
             colors=list('bgrcmyk')):
+        """Absolute Timing plot.
+            Parameters:
+            -----------
+            results: The benchmark results from BenchmarkRunner.
+            fig: matplotlib figure object, optional
+            horizontal: The plot will be horizontal or vertical, optional
+            colors:  the colormap for the plots, optional
+
+            Returns:
+            --------
+            fig: matplotlib figure
+        """
 
         def bar_f(ax, x, y, w, start=None, **kwds):
             if not horizontal:
@@ -158,6 +170,19 @@ class BenchmarkRunner(object):
 
     def plot_relative(self, results, ref_bench=None, fig=None,
                     horizontal=True, colors=list('bgrcmyk')):
+        """Relative plot.
+            Parameters:
+            -----------
+            results: The benchmark results from BenchmarkRunner.
+            ref_bench: The Benchmark object that will be the baseline, optional
+            fig: matplotlib figure object, optional
+            horizontal: The plot will be horizontal or vertical, optional
+            colors:  the colormap for the plots, optional
+
+            Returns:
+            --------
+            fig: matplotlib figure
+        """
 
         def bar_f(ax, x, y, w, start=None, **kwds):
             if not horizontal:
