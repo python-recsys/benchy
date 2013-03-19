@@ -68,6 +68,33 @@ consumption *usage* in *units* . In addition, the key 'runtime' indicates
 the runtime performance in timing results. It presents the number of calls
 *repeat* following the average time to execute it *timing* in *units*.
 
+Do you want see a more presentable output ? It is possible with the method ``to_rst``::
+
+    rst_text = benchmark1.to_rst(results)
+
+
+The output::
+
+    **Benchmark setup**
+
+    .. code-block:: python
+
+
+
+    **Benchmark statement**
+
+    .. code-block:: python
+
+        lst = ['c' for x in range(100000)]
+
+    +-----------------+--------+--------+-------+-------+
+    |            name | repeat | timing | loops | units |
+    +=================+========+========+=======+=======+
+    | list with range |      3 |  6.739 |   100 |    ms |
+    +-----------------+--------+--------+-------+-------+
+
+
+
 Now let's check which one is faster and which one consumes less memory. Let's
 create a ``BenchmarkSuite``. It is referred as a container for benchmarks.::
 
@@ -90,7 +117,17 @@ Let's run the suite::
     runner.run()
 
 Output will follow::
+    {Benchmark('list with "*"'):
+        {'runtime': {'timing': 0.47582697868347168, 'repeat': 3, 'success': True, 'loops': 1000, 'timeBaselines': 1.0, 'units': 'ms'},
+        'memory': {'usage': 0.3828125, 'units': 'MB', 'repeat': 3, 'success': True}},
+    Benchmark('list with xrange'):
+        {'runtime': {'timing': 5.623779296875, 'repeat': 3, 'success': True, 'loops': 100, 'timeBaselines': 11.818958463504936, 'units': 'ms'},
+        'memory': {'usage': 0.71484375, 'units': 'MB', 'repeat': 3, 'success': True}},
+    Benchmark('list with range'): {
+        'runtime': {'timing': 6.5933513641357422, 'repeat': 3, 'success': True, 'loops': 100, 'timeBaselines': 13.856615239384636, 'units': 'ms'},
+        'memory': {'usage': 2.2109375, 'units': 'MB', 'repeat': 3, 'success': True}}}
 
+Ok, but let's present
 
 ============================
  Frequently Asked Questions
