@@ -284,11 +284,13 @@ Final Results
       the amount of memory that is actually used by the Python
       interpreter. Also, because of how the garbage collector works in
       Python the result might be different between platforms and even
-      between runs.
+      between runs. The runtime performance is obtained by calling the
+      python standard library `timeit <http://docs.python.org/2/library/timeit.html>`_
+      module. So it also can lead to different results between platforms and
+      even runs.
 
     * Q: Does it work under windows ?
-    * A: Yes, but you will need the
-      `psutil <http://pypi.python.org/pypi/psutil>`_ module.
+    * A: I didn't test yet. It will be a issue in the Github's issue tracker.
 
 
 
