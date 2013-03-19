@@ -147,7 +147,7 @@ Going back to the list allocation, let's save the plot::
 .. image:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
 
 
-As you can see the graph aboe the xrange method is 12x slower and the range approach is 13x.  Let's see the absolute timings. Just call the method ``plot_absolute`
+As you can see the graph aboe the xrange method is 12x slower and the range approach is 13x.  Let's see the absolute timings. Just call the method ``plot_absolute`::
 
     def plot_absolute(self, results, fig=None, horizontal=True,
             colors=list('bgrcmyk')):
@@ -159,6 +159,120 @@ Showing the plot now::
     plt.savefig('%s.png' % runner.name) # bbox_inches='tight')
 
 .. image:: https://dl.dropbox.com/u/1977573/ListCreation.png
+
+You may notice besides the bar representing the timings, the line plot
+representing the memory consumption for each statement. There is a positive
+correlation between the memory consumption and the runtime performance.
+
+Finally, benchy also provides a full repport for all benchmarks by calling
+the method ``to_rst``::
+
+    rst_text = runner.to_rst(results, runner.name + 'png',
+            runner.name + '_r.png')
+    with open('teste.rst', 'w') as f:
+            f.write(rst_text)
+
+The expected output (the configuration I added manually):
+
+
+Performance Benchmarks
+======================
+
+These historical benchmark graphs were produced with `benchy
+<http://github.com/python-recsys/benchy>`__.
+
+Produced on a machine with
+
+  - Intel Core i5 950 processor
+  - Mac Os 10.6
+  - Python 2.6.5  64-bit
+  - NumPy 1.6.1
+
+
+list with "*"
+-------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    lst = ['c'] * 100000
+
++---------------+--------+--------+-------+-------+
+|          name | repeat | timing | loops | units |
++===============+========+========+=======+=======+
+| list with "*" |      3 | 0.4788 |  1000 |    ms |
++---------------+--------+--------+-------+-------+
+
+list with xrange
+----------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    lst = ['c' for x in xrange(100000)]
+
++------------------+--------+--------+-------+-------+
+|             name | repeat | timing | loops | units |
++==================+========+========+=======+=======+
+| list with xrange |      3 |  5.772 |   100 |    ms |
++------------------+--------+--------+-------+-------+
+
+list with range
+---------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    lst = ['c' for x in range(100000)]
+
++-----------------+--------+--------+-------+-------+
+|            name | repeat | timing | loops | units |
++=================+========+========+=======+=======+
+| list with range |      3 |  7.037 |   100 |    ms |
++-----------------+--------+--------+-------+-------+
+
+Final Results
+-------------
++------------------+--------+--------+-------+-------+---------------+
+|             name | repeat | timing | loops | units | timeBaselines |
++==================+========+========+=======+=======+===============+
+|    list with "*" |      3 | 0.4788 |  1000 |    ms |             1 |
++------------------+--------+--------+-------+-------+---------------+
+| list with xrange |      3 |  5.772 |   100 |    ms |         12.05 |
++------------------+--------+--------+-------+-------+---------------+
+|  list with range |      3 |  7.037 |   100 |    ms |          14.7 |
++------------------+--------+--------+-------+-------+---------------+
+
+**Performance Relative graph**
+
+.. image:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
+   :width: 6in
+**Performance Absolute graph**
+
+.. image:: https://dl.dropbox.com/u/1977573/ListCreation.png
+   :width: 6in
+
 
 
 ============================
