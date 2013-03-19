@@ -73,7 +73,7 @@ Do you want see a more presentable output ? It is possible calling the method ``
     rst_text = benchmark1.to_rst(results)
 
 
-The output::
+The output
 
     **Benchmark setup**
 
