@@ -117,12 +117,15 @@ Let's run the suite::
     n_benchs, results = runner.run()
 
 Output will follow::
+
     {Benchmark('list with "*"'):
         {'runtime': {'timing': 0.47582697868347168, 'repeat': 3, 'success': True, 'loops': 1000, 'timeBaselines': 1.0, 'units': 'ms'},
         'memory': {'usage': 0.3828125, 'units': 'MB', 'repeat': 3, 'success': True}},
+
     Benchmark('list with xrange'):
         {'runtime': {'timing': 5.623779296875, 'repeat': 3, 'success': True, 'loops': 100, 'timeBaselines': 11.818958463504936, 'units': 'ms'},
         'memory': {'usage': 0.71484375, 'units': 'MB', 'repeat': 3, 'success': True}},
+
     Benchmark('list with range'): {
         'runtime': {'timing': 6.5933513641357422, 'repeat': 3, 'success': True, 'loops': 100, 'timeBaselines': 13.856615239384636, 'units': 'ms'},
         'memory': {'usage': 2.2109375, 'units': 'MB', 'repeat': 3, 'success': True}}}
@@ -141,7 +144,7 @@ Going back to the list allocation, let's save the plot::
     plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
 
 
-.. image:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
+.. image:: https://github.com/python-recsys/benchy/blob/master/docs/ListCreation_r.png
 
 
 
