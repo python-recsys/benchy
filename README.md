@@ -141,7 +141,7 @@ Going back to the list allocation, let's save the plot::
     plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
 
 
-.. figure:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
+.. image:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
 
 
 
