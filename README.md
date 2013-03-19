@@ -68,7 +68,7 @@ consumption *usage* in *units* . In addition, the key 'runtime' indicates
 the runtime performance in timing results. It presents the number of calls
 *repeat* following the average time to execute it *timing* in *units*.
 
-Do you want see a more presentable output ? It is possible with the method ``to_rst``::
+Do you want see a more presentable output ? It is possible calling the method ``to_rst`` with the results as parameter::
 
     rst_text = benchmark1.to_rst(results)
 
@@ -114,7 +114,7 @@ analysis and print out interesting reports::
 
 Let's run the suite::
 
-    runner.run()
+    n_benchs, results = runner.run()
 
 Output will follow::
     {Benchmark('list with "*"'):
@@ -127,7 +127,23 @@ Output will follow::
         'runtime': {'timing': 6.5933513641357422, 'repeat': 3, 'success': True, 'loops': 100, 'timeBaselines': 13.856615239384636, 'units': 'ms'},
         'memory': {'usage': 2.2109375, 'units': 'MB', 'repeat': 3, 'success': True}}}
 
-Ok, but let's present
+Next, we will plot the relative timings. It is important to measure how faster the other benchmarks are compared to reference one. By calling the method ``plot_relative``::
+
+
+    def plot_relative(self, results, ref_bench=None, fig=None,
+                    horizontal=True, colors=list('bgrcmyk')):
+
+        ...
+
+Going back to the list allocation, let's save the plot::
+
+    fig = runner.plot_relative(results, horizontal=True)
+    plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
+
+
+.. figure:: https://dl.dropbox.com/u/1977573/List%20Creation_r.png
+
+
 
 ============================
  Frequently Asked Questions
