@@ -144,7 +144,8 @@ Going back to the list allocation, let's save the plot::
     plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
 
 
-.. image:: https://github.com/python-recsys/benchy/blob/master/docs/ListCreation_r.png
+.. image:: https://raw.github.com/python-recsys/benchy/master/docs/ListCreation_r.png
+
 
 
 
