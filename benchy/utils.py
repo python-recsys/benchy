@@ -33,6 +33,32 @@ def getTable(results, name, header, numberFormat="%.4g", **kwargs):
     return __asRst(header, reducedTable)
 
 
+def getAllTable(results, header, numberFormat="%.4g", **kwargs):
+
+    #format = ['%s', '%s', "%.4g", "%d", "%s"]
+
+    #header = ['name', 'repeat', 'timing', 'loops', 'units',
+    #            'timeBaselines']
+
+    reducedTable = []
+    for bm, result in results.iteritems():
+        result = result['runtime']
+        row = []
+        result['name'] = bm.name
+        for h in header:
+            value = result[h]
+            try:
+                float(value)
+                value = numberFormat % value
+            except:
+                pass
+            value = str(value)
+            row.append(value)
+        reducedTable.append(row)
+
+    return __asRst(header, reducedTable)
+
+
 def __asRst(header, table):
     maxSize = __columnWidths(header, table)
     lines = []

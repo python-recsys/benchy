@@ -3,7 +3,7 @@ import pickle
 import subprocess
 import matplotlib.pyplot as plt
 import numpy as np
-import string
+from utils import getAllTable
 
 
 class BenchmarkRunner(object):
@@ -278,7 +278,8 @@ Produced on a machine with
 
         output += '\n%s\n%s\n%s\n' % ('Final Results',
                     '-' * len('Final Results'),
-                        self.getTable(results))
+                    getAllTable(results,
+             ['name', 'repeat', 'timing', 'loops', 'units', 'timeBaselines']))
 
         if image_relative_path is not None:
             output += ("\n**Performance Relative graph**\n\n.. image:: %s"
@@ -289,57 +290,6 @@ Produced on a machine with
                        "\n   :width: 6in" % image_absolute_path)
 
         return output
-
-    def getTable(self, results, numberFormat="%.4g", **kwargs):
-
-        # format = ['%s', '%s', '%d', "%.4g", "%.4g", "%.4g"]
-
-        header = ['name', 'repeat', 'timing', 'loops', 'units',
-                    'timeBaselines']
-
-        reducedTable = []
-        for bm, result in results.iteritems():
-            result = result['runtime']
-            row = []
-            result['name'] = bm.name
-            for h in header:
-                value = result[h]
-                try:
-                    float(value)
-                    value = numberFormat % value
-                except:
-                    pass
-                value = str(value)
-                row.append(value)
-            reducedTable.append(row)
-
-        return self.__asRst(header, reducedTable)
-
-    def __asRst(self, header, table):
-        maxSize = self.__columnWidths(header, table)
-        lines = []
-        lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
-                            + '-+')
-        lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
-                     for i, v in enumerate(header)]) + ' |')
-        lines.append('+=' + '=+='.join(['=' * size for size in maxSize])
-                            + '=+')
-        for row in table:
-            lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
-                     for i, v in enumerate(row)]) + ' |')
-            lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
-                            + '-+')
-        return os.linesep.join(lines)
-
-    def __columnWidths(self, header, table):
-        sizes = []
-        for h in header:
-            sizes.append(len(h))
-        for row in table:
-            for j, v in enumerate(row):
-                if len(v) > sizes[j]:
-                    sizes[j] = len(v)
-        return sizes
 
 
 if __name__ == '__main__':
@@ -365,8 +315,8 @@ if __name__ == '__main__':
 
     runner = BenchmarkRunner(suite, '.', 'List Creation')
     n_benchs, results = runner.run()
-    print results
-    fig = runner.plot_relative(results, horizontal=True)
+    #print results
+    #fig = runner.plot_relative(results, horizontal=True)
     #plt.savefig('%s_r.png' % runner.name, bbox_inches='tight')
 
     #runner.plot_absolute(results, horizontal=False)
