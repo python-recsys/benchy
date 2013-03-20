@@ -2,10 +2,8 @@ import traceback
 import cProfile
 import pstats
 import hashlib
-import string
-import os
 from cStringIO import StringIO
-from utils import indent, magic_timeit, magic_memit
+from utils import indent, magic_timeit, magic_memit, getTable
 
 
 class Benchmark(object):
@@ -51,59 +49,11 @@ class Benchmark(object):
 %s
 
 %s
-""" % (indent(self.setup), indent(self.code), self.getTable(results))
+""" % (indent(self.setup), indent(self.code),
+        getTable(results['runtime'], self.name,
+                ['name', 'repeat', 'timing', 'loops', 'units']))
 
         return output
-
-    def getTable(self, results, numberFormat="%.4g", **kwargs):
-
-        results = results['runtime']
-
-        # format = ['%s', '%s', '%d', "%.4g", "%.4g", "%.4g"]
-
-        header = ['name', 'repeat', 'timing', 'loops', 'units']
-        results['name'] = self.name
-
-        reducedTable = []
-        row = []
-        for v in header:
-            value = results[v]
-            try:
-                float(value)
-                value = numberFormat % value
-            except:
-                pass
-            value = str(value)
-            row.append(value)
-        reducedTable.append(row)
-
-        return self.__asRst(header, reducedTable)
-
-    def __asRst(self, header, table):
-        maxSize = self.__columnWidths(header, table)
-        lines = []
-        lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
-                            + '-+')
-        lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
-                     for i, v in enumerate(header)]) + ' |')
-        lines.append('+=' + '=+='.join(['=' * size for size in maxSize])
-                            + '=+')
-        for row in table:
-            lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
-                     for i, v in enumerate(row)]) + ' |')
-            lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
-                            + '-+')
-        return os.linesep.join(lines)
-
-    def __columnWidths(self, header, table):
-        sizes = []
-        for h in header:
-            sizes.append(len(h))
-        for row in table:
-            for j, v in enumerate(row):
-                if len(v) > sizes[j]:
-                    sizes[j] = len(v)
-        return sizes
 
     def profile(self, ncalls):
         prof = cProfile.Profile()

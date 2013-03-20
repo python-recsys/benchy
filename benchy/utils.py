@@ -1,11 +1,64 @@
 """
 The :mod:`benchy.utils` module includes various utilites.
 """
+import string
+import os
 
 
 def indent(string, spaces=4):
     dent = ' ' * spaces
     return '\n'.join([dent + x for x in string.split('\n')])
+
+
+def getTable(results, name, header, numberFormat="%.4g", **kwargs):
+
+    #format = ['%s', '%s', "%.4g", "%d", "%s"]
+    #header = ['name', 'repeat', 'timing', 'loops', 'units']
+
+    results['name'] = name
+
+    reducedTable = []
+    row = []
+    for v in header:
+        value = results[v]
+        try:
+            float(value)
+            value = numberFormat % value
+        except:
+            pass
+        value = str(value)
+        row.append(value)
+    reducedTable.append(row)
+
+    return __asRst(header, reducedTable)
+
+
+def __asRst(header, table):
+    maxSize = __columnWidths(header, table)
+    lines = []
+    lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
+                        + '-+')
+    lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
+                 for i, v in enumerate(header)]) + ' |')
+    lines.append('+=' + '=+='.join(['=' * size for size in maxSize])
+                        + '=+')
+    for row in table:
+        lines.append('| ' + ' | '.join([string.rjust(v, maxSize[i])
+                 for i, v in enumerate(row)]) + ' |')
+        lines.append('+-' + '-+-'.join(['-' * size for size in maxSize])
+                        + '-+')
+    return os.linesep.join(lines)
+
+
+def __columnWidths(header, table):
+    sizes = []
+    for h in header:
+        sizes.append(len(h))
+    for row in table:
+        for j, v in enumerate(row):
+            if len(v) > sizes[j]:
+                sizes[j] = len(v)
+    return sizes
 
 
 def magic_timeit(ns, stmt, ncalls=None, repeat=3, force_ms=False):
