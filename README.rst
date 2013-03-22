@@ -345,6 +345,35 @@ This module was written by `Marcel Caraciolo <http://aimotion.blogspot.com>`_
 Inspired by Wes Mckinney `vbench <https://github.com/pydata/vbench>`_.
 
 
+**Benchmark setup**
+
+.. code-block:: python
+
+
+    import numpy
+    X = numpy.random.uniform(1,5,(1000,))
+
+    import scipy.spatial.distance as ssd
+    X = X.reshape(-1,1)
+    def cosine_distances(X, Y):
+        return 1. - ssd.cdist(X, Y, 'cosine')
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    cosine_distances(X, X)
+
++---------------------+--------+--------+-------+-------+
+|                name | repeat | timing | loops | units |
++=====================+========+========+=======+=======+
+| scipy.spatial 0.8.0 |      3 |  18.36 |    10 |    ms |
++---------------------+--------+--------+-------+-------+
+
+
+
 =========
  License
 =========
