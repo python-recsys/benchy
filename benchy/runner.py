@@ -54,7 +54,7 @@ class BenchmarkRunner(object):
 
             dirname = os.path.dirname(__file__)
 
-            cmd = 'python %srun_benchmarks.py %s %s' % \
+            cmd = 'python %s/run_benchmarks.py %s %s' % \
                         (dirname, pickle_path, results_path)
             print cmd
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
@@ -86,7 +86,7 @@ class BenchmarkRunner(object):
         return len(self.benchmarks), self.relative_timings(results)
 
     def plot_absolute(self, results, fig=None, horizontal=True,
-            colors=list('bgrcmyk')):
+            colors=list('bgrcmyk'), logy=False):
         """Absolute Timing plot.
             Parameters:
             -----------
@@ -94,6 +94,7 @@ class BenchmarkRunner(object):
             fig: matplotlib figure object, optional
             horizontal: The plot will be horizontal or vertical, optional
             colors:  the colormap for the plots, optional
+            logy:  log scale, optional
 
             Returns:
             --------
@@ -124,7 +125,7 @@ class BenchmarkRunner(object):
             color = colors[idx % len(colors)]
             rect = bar_f(ax, ax_pos[idx],
                      y, 0.75 / 1, start=pos_prior[idx],
-                    label=bm.name, color=color)
+                    label=bm.name, color=color, log=logy)
 
             rects.append(rect)
             labels.append(bm.name)
@@ -169,7 +170,7 @@ class BenchmarkRunner(object):
         return fig
 
     def plot_relative(self, results, ref_bench=None, fig=None,
-                    horizontal=True, colors=list('bgrcmyk')):
+                    horizontal=True, colors=list('bgrcmyk'), logy=False):
         """Relative plot.
             Parameters:
             -----------
@@ -178,6 +179,7 @@ class BenchmarkRunner(object):
             fig: matplotlib figure object, optional
             horizontal: The plot will be horizontal or vertical, optional
             colors:  the colormap for the plots, optional
+            logy:  log scale, optional
 
             Returns:
             --------
@@ -209,7 +211,7 @@ class BenchmarkRunner(object):
             color = colors[idx % len(colors)]
             rect = bar_f(ax, ax_pos[idx],
                      y, 0.75 / 1, start=pos_prior[idx],
-                    label=bm.name, color=color)
+                    label=bm.name, color=color, log=logy)
 
             if time_reference:
                 if result['timing'] < time_reference:
@@ -230,6 +232,7 @@ class BenchmarkRunner(object):
             ax.set_yticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
             ax.set_yticklabels([self.name + ' (less is better)'], rotation=90)
             ax.set_xlabel('time ratio')
+
             for rect in rects:
                 rect = rect[0]
                 h = rect.get_width()
@@ -241,6 +244,7 @@ class BenchmarkRunner(object):
             ax.set_xticks([(ax_pos[-1] - ax_pos[0] + 1.25) / 2.0])
             ax.set_xticklabels([self.name + ' (less is better)'], rotation=0)
             ax.set_ylabel('time ratio')
+
             for rect in rects:
                 rect = rect[0]
                 h = rect.get_height()
