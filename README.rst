@@ -344,7 +344,156 @@ This module was written by `Marcel Caraciolo <http://aimotion.blogspot.com>`_
 
 Inspired by Wes Mckinney `vbench <https://github.com/pydata/vbench>`_.
 
+Performance Benchmarks
+======================
 
+These historical benchmark graphs were produced with `benchy
+<http://github.com/python-recsys/benchy>`__.
+
+Produced on a machine with
+
+  - Intel Core i5 950 processor
+  - Mac Os 10.6
+  - Python 2.6.5  64-bit
+  - NumPy 1.6.1
+
+
+scipy.spatial 0.8.0
+-------------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+    import numpy
+    X = numpy.random.uniform(1,5,(1000,))
+
+    import scipy.spatial.distance as ssd
+    X = X.reshape(-1,1)
+    def cosine_distances(X, Y):
+        return 1. - ssd.cdist(X, Y, 'cosine')
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    cosine_distances(X, X)
+
++---------------------+--------+--------+-------+-------+
+|                name | repeat | timing | loops | units |
++=====================+========+========+=======+=======+
+| scipy.spatial 0.8.0 |      3 |  19.19 |    10 |    ms |
++---------------------+--------+--------+-------+-------+
+
+sklearn 0.13.1
+--------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+    import numpy
+    X = numpy.random.uniform(1,5,(1000,))
+
+    from sklearn.metrics.pairwise import cosine_similarity as cosine_distances
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    cosine_distances(X, X)
+
++----------------+--------+--------+-------+-------+
+|           name | repeat | timing | loops | units |
++================+========+========+=======+=======+
+| sklearn 0.13.1 |      3 | 0.1812 |  1000 |    ms |
++----------------+--------+--------+-------+-------+
+
+nltk.cluster
+------------
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+    import numpy
+    X = numpy.random.uniform(1,5,(1000,))
+
+    from nltk import cluster
+    def cosine_distances(X, Y):
+        return 1. - cluster.util.cosine_distance(X, Y)
+
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    cosine_distances(X, X)
+
++--------------+--------+---------+-------+-------+
+|         name | repeat |  timing | loops | units |
++==============+========+=========+=======+=======+
+| nltk.cluster |      3 | 0.01024 | 1e+04 |    ms |
++--------------+--------+---------+-------+-------+
+
+numpy
+-----
+
+**Benchmark setup**
+
+.. code-block:: python
+
+
+    import numpy
+    X = numpy.random.uniform(1,5,(1000,))
+
+    import numpy, math
+    def cosine_distances(X, Y):
+        return 1. -  numpy.dot(X, Y) / (math.sqrt(numpy.dot(X, X)) *
+                                         math.sqrt(numpy.dot(Y, Y)))
+
+
+**Benchmark statement**
+
+.. code-block:: python
+
+    cosine_distances(X, X)
+
++-------+--------+----------+-------+-------+
+|  name | repeat |   timing | loops | units |
++=======+========+==========+=======+=======+
+| numpy |      3 | 0.009339 | 1e+05 |    ms |
++-------+--------+----------+-------+-------+
+
+Final Results
+-------------
++---------------------+--------+----------+-------+-------+---------------+
+|                name | repeat |   timing | loops | units | timeBaselines |
++=====================+========+==========+=======+=======+===============+
+| scipy.spatial 0.8.0 |      3 |    19.19 |    10 |    ms |          2055 |
++---------------------+--------+----------+-------+-------+---------------+
+|      sklearn 0.13.1 |      3 |   0.1812 |  1000 |    ms |         19.41 |
++---------------------+--------+----------+-------+-------+---------------+
+|        nltk.cluster |      3 |  0.01024 | 1e+04 |    ms |         1.097 |
++---------------------+--------+----------+-------+-------+---------------+
+|               numpy |      3 | 0.009339 | 1e+05 |    ms |             1 |
++---------------------+--------+----------+-------+-------+---------------+
+
+**Performance Relative graph**
+
+.. image:: Cosine_benchmarkspng
+   :width: 6in
+**Performance Absolute graph**
+
+.. image:: Cosine_benchmarks_r.png
+   :width: 6in
 
 
 =========
